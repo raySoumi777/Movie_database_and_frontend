@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url(../frontend/Image/backc.jpeg);
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .inputBox {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-bottom: 2px solid #462e35;
+            color: #462e35;
+            transition: all 0.3s ease;
+        }
+        .inputBox::placeholder {
+            color: rgba(39, 4, 14, 0.7);
+            font-weight: bold;
+        }
+        .inputBox:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-bottom-color: #051455;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .Rbtn {
+            padding: 10px 20px;
+            background-color: rgba(21, 13, 136, 0.8);
+            color: antiquewhite;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .Rbtn:hover {
+            background-color: rgba(22, 173, 34, 0.8);
+            color: rgb(58, 58, 58);
+        }
+        .outputDiv {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(247, 6, 6, 0.418);
+            border-radius: 8px;
+            color: antiquewhite;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: rgba(21, 13, 136, 0.8);
+            color: antiquewhite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-group">
+            <input class="inputBox" placeholder="Upper limit of the year">
+        </div>
+        <div class="input-group">
+            <input class="inputBox" placeholder="Lower limit of the year">
+        </div>
+        <div class="btn-container">
+            <button class="Rbtn" onclick="generateReport1()">Generate Report-1</button>
+        </div>
+        <div class="outputDiv" id="report1Output">
+            <!-- Report 1 will be inserted here -->
+        </div>
+        
+        <div class="input-group">
+            <input class="inputBox" placeholder="Production Company name">
+        </div>
+        <div class="btn-container">
+            <button class="Rbtn" onclick="generateReport2()">Generate Report-2</button>
+        </div>
+        <div class="outputDiv" id="report2Output">
+            <!-- Report 2 will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        function generateReport1() {
+            // This function would typically make an AJAX call to your backend
+            // For demonstration, we'll just insert a sample table
+            const tableHTML = `
+                <table>
+                    <tr>
+                        <th>Sno.</th>
+                        <th>Movie Name</th>
+                        <th>Release Date</th>
+                        <th>Director</th>
+                        <th>Genre</th>
+                        <th>Production Company</th>
+                        <th>Running Length</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Sample Movie</td>
+                        <td>2023-07-18</td>
+                        <td>John Doe</td>
+                        <td>Action</td>
+                        <td>Sample Studios</td>
+                        <td>120 min</td>
+                    </tr>
+                    <!-- More rows would be added here from the database -->
+                </table>
+            `;
+            document.getElementById('report1Output').innerHTML = tableHTML;
+        }
+
+        function generateReport2() {
+            // Similar to generateReport1, but for the second report
+            // This would be customized based on the production company input
+        }
+    </script>
+</body>
+</html>

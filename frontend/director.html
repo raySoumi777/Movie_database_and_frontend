@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Director Details Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: url('/Image/dir1.jpeg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            max-width: 400px;
+            width: 100%;
+        }
+        h2 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            font-weight: bold;
+        }
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            font-weight: bold;
+        }
+        input::placeholder {
+            color: rgba(255,255, 255, 0.8);
+        }
+        input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.3);
+        }
+        button {
+            background-color: rgba(3, 60, 68, 0.808);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: rgba(106, 176, 117, 1);
+        }
+        #movieContainer {
+            margin-top: 15px;
+        }
+        .movie-entry {
+            margin-top: 15px;
+        }
+        .movie-entry input[type="text"] {
+            width: calc(100% - 100px);
+            margin-right: 10px;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            color: #fff;
+        }
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        @media screen and (max-width: 480px) {
+            .form-container {
+                padding: 20px;
+            }
+            .movie-entry input[type="text"] {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+        select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Enter details of the Director</h2>
+        <form id="directorForm" method="post" action="/addDirector">
+            <input type="text" id="directorName" name="directorName" placeholder="Director Name" required>
+            <input type="date" id="directorDOB" name ="directorDOB" required>
+            <button type="button" id="addMovieBtn">Add Movie</button>
+            <div id="movieContainer"></div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <script>
+        let movies = []; // Define movies array
+
+        // Fetch movies when the page loads
+        fetch('/api/movies')
+            .then(response => response.json())
+            .then(data => {
+                movies = data.map(movie => movie.m_title);
+            })
+            .catch(error => console.error('Error fetching movies:', error));
+    
+        document.getElementById('addMovieBtn').addEventListener('click', function() {
+            const movieContainer = document.getElementById('movieContainer');
+            const movieIndex = movieContainer.children.length;
+            const movieEntry = document.createElement('div');
+            let movieOptions = movies.map(movie => `<option value="${movie}">${movie}</option>`).join('');
+          
+            movieEntry.className = 'movie-entry';
+            movieEntry.innerHTML = `
+                 <div class="input-group">
+                    <label for="movie${movieIndex}">Movie</label>
+                    <select name="movie${movieIndex}" required>
+                        <option value="">Select a movie</option>
+                        ${movieOptions}
+                    </select>
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="isActor${movieIndex}" name="isActor${movieIndex}" onchange="toggleActorFields(${movieIndex})">
+                    <label for="isActor${movieIndex}">Is Actor</label>
+                </div>
+                <div id="actorFields${movieIndex}" style="display:none;">
+                    <input type="text" name="quote${movieIndex}" placeholder="Quote">
+                    <textarea name="role${movieIndex}" placeholder="Role"></textarea>
+                </div>
+            `;
+            movieContainer.appendChild(movieEntry);
+        });
+    
+        function toggleActorFields(index) {
+            const checkbox = document.getElementById(`isActor${index}`);
+            const actorFields = document.getElementById(`actorFields${index}`);
+            actorFields.style.display = checkbox.checked ? 'block' : 'none';
+        }
+    
+        document.getElementById('directorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = {
+                directorName: formData.get('directorName'),
+                directorDOB: formData.get('directorDOB'),
+                movies: []
+            };
+    
+            const movieEntries = document.querySelectorAll('.movie-entry');
+            movieEntries.forEach((entry, index) => {
+                const movieData = {
+                    name: formData.get(`movie${index}`),
+                    isActor: formData.get(`isActor${index}`) === 'on'
+                };
+                if (movieData.isActor) {
+                    movieData.quote = formData.get(`quote${index}`);
+                    movieData.role = formData.get(`role${index}`);
+                }
+                data.movies.push(movieData);
+            });
+    
+            console.log('Form data:', data);
+            //send to server
+            fetch('/addDirector', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(result => {
+                console.log('Success:', result);
+                alert('Director added successfully!');
+                // Optionally reset the form here
+                this.reset();
+                document.getElementById('movieContainer').innerHTML = '';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while submitting the form.');
+            });
+
+        });
+    </script>
+</body>
+</html>

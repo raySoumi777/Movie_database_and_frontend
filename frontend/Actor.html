@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actor Details Form</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        input[type="text"], select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #addMovie {
+            margin-bottom: 20px;
+        }
+        #movieQuotes {
+            margin-top: 20px;
+        }
+        .movie-quote {
+            margin-bottom: 20px;
+        }
+        #submitBtn {
+            margin-top: 20px;
+            background-color: #28a745;
+        }
+        #submitBtn:hover {
+            background-color: #218838;
+        }
+        @media (max-width: 600px) {
+            form {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <form id="actorForm" method="post" action="/addActor">
+        <h2>Enter details of the Actor</h2>
+        
+        <div class="input-group">
+            <label for="actorName">Actor Name</label>
+            <input type="text" id="actorName" name="actorName" required>
+        </div>
+
+        <div class="input-group">
+            <label for="dob">DOB</label>
+            <input type="date" id="dob" name="dob" required>
+        </div>
+
+        <button type="button" id="addMovie">Add Movie</button>
+
+        <div id="movieQuotes"></div>
+
+        <button type="submit" id="submitBtn">Submit</button>
+    </form>
+
+    <script>
+        let movies = [];
+        let act = 0; // You need to get this value from the server
+        let quote = 0; // You need to get this value from the server
+      
+        // Fetch movies when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+          fetch('/api/movies')
+            .then(response => response.json())
+            .then(data => {
+              movies = data.map(movie => movie.m_title);
+            })
+            .catch(error => console.error('Error fetching movies:', error));
+        });
+      
+        document.getElementById('addMovie').addEventListener('click', function() {
+          const movieQuotes = document.getElementById('movieQuotes');
+          const movieQuoteDiv = document.createElement('div');
+          movieQuoteDiv.className = 'movie-quote';
+          
+          let movieOptions = movies.map(movie => `<option value="${movie}">${movie}</option>`).join('');
+          
+          movieQuoteDiv.innerHTML = `
+            <div class="input-group">
+              <label for="movie">Movie</label>
+              <select name="movie" required>
+                <option value="">Select a movie</option>
+                ${movieOptions}
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="quote">Quote</label>
+              <textarea name="quote" placeholder="Enter a quote" required></textarea>
+            </div>
+            <div class="input-group">
+              <label for="role">Role</label>
+              <input type="text" name="role" required>
+            </div>
+          `;
+          movieQuotes.appendChild(movieQuoteDiv);
+        });
+      
+        document.getElementById('actorForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const formData = new FormData(this);
+          const actorData = {
+            actorname: formData.get('actorName'),
+            dob: formData.get('dob'),
+            movies: []
+          };
+
+          const movieQuotes = document.querySelectorAll('.movie-quote');
+          movieQuotes.forEach(movieQuote => {
+            const movie = movieQuote.querySelector('select[name="movie"]').value;
+            const quote = movieQuote.querySelector('textarea[name="quote"]').value;
+            const role = movieQuote.querySelector('input[name="role"]').value;
+            actorData.movies.push({ movie, quote, role });
+          });
+
+          fetch('/addActor', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(actorData),
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Success:', data);
+            alert('Actor added successfully!');
+            this.reset();
+            document.getElementById('movieQuotes').innerHTML = '';
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+            alert('Error adding actor. Please try again.');
+          });
+        });
+      </script>
+</body>
+</html>
